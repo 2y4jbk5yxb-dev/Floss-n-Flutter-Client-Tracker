@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#111116" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Client Book" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>Salon Client Book</title>
+  <style>
+    :root{
+      --bg:#0d0e13;
+      --panel:#15171f;
+      --panel2:#1b1e28;
+      --card:#101219;
+      --line:#2d313f;
+      --text:#f3f3f6;
+      --muted:#b9bfcb;
+      --accent:#cba574;
+      --accent2:#f5d8ae;
+      --danger:#d97676;
+      --success:#76c593;
+      --warning:#e0b65f;
+      --shadow:0 14px 30px rgba(0,0,0,.28);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,#0c0d12,#12141c);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    body{min-height:100vh}
+    .app{max-width:1120px;margin:0 auto;padding:16px 14px 86px}
+    .topbar{
+      position:sticky;top:10px;z-index:20;
+      background:rgba(21,23,31,.92);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px)
+    }
+    h1{margin:0 0 4px;font-size:1.45rem}
+    .sub{color:var(--muted);font-size:.95rem;line-height:1.42}
+    .nav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-top:15px}
+    .nav button{
+      border:1px solid var(--line);background:var(--panel2);color:var(--text);
+      border-radius:14px;padding:11px 8px;min-height:48px;font-weight:700;cursor:pointer
+    }
+    .nav button.active{background:linear-gradient(180deg,#2a2217,#1c1711);color:var(--accent2);border-color:#6b5336}
+    .screen{display:none;margin-top:16px}
+    .screen.active{display:block}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+    .card{
+      background:rgba(21,23,31,.94);border:1px solid var(--line);border-radius:var(--radius);
+      padding:16px;box-shadow:var(--shadow)
+    }
+    .span-3{grid-column:span 3}.span-4{grid-column:span 4}.span-5{grid-column:span 5}.span-6{grid-column:span 6}.span-7{grid-column:span 7}.span-8{grid-column:span 8}.span-12{grid-column:span 12}
+    h2,h3{margin:0 0 12px}
+    label{display:block;font-size:.9rem;font-weight:700;color:var(--muted);margin:0 0 6px}
+    input,select,textarea{
+      width:100%;min-height:46px;padding:12px 13px;background:#0e1016;color:var(--text);
+      border:1px solid var(--line);border-radius:12px;font-size:1rem
+    }
+    textarea{min-height:94px;resize:vertical}
+    .row{margin-bottom:12px}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+    button.primary,button.secondary,button.danger,button.success,button.warning{
+      border:0;border-radius:14px;padding:12px 15px;min-height:44px;font-weight:800;cursor:pointer
+    }
+    button.primary{background:var(--accent);color:#17120b}
+    button.secondary{background:#2a2e3a;color:var(--text);border:1px solid var(--line)}
+    button.danger{background:#502727;color:#ffdada;border:1px solid #7d4141}
+    button.success{background:#183123;color:#d6ffe4;border:1px solid #3a6c50}
+    button.warning{background:#443517;color:#ffe9c2;border:1px solid #806337}
+    .kpi{padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+    .kpi .label{font-size:.84rem;color:var(--muted)}
+    .kpi .value{font-size:1.4rem;font-weight:800;margin-top:4px}
+    .stack{display:grid;gap:10px}
+    .list-card{padding:14px;border:1px solid var(--line);border-radius:15px;background:var(--card)}
+    .list-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:6px}
+    .name{font-weight:800;font-size:1.03rem}
+    .muted{color:var(--muted)}
+    .tiny{font-size:.84rem}
+    .pill{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 10px;border-radius:999px;border:1px solid var(--line);background:#11131b;
+      font-size:.81rem;font-weight:800;margin:0 6px 6px 0
+    }
+    .pill.accent{color:var(--accent2);border-color:#664f34;background:#1b1510}
+    .pill.success{color:#cff3dc;border-color:#37604b;background:#132018}
+    .pill.warning{color:#ffe6b4;border-color:#7d6231;background:#221b10}
+    .pill.danger{color:#ffd2d2;border-color:#7a4040;background:#251313}
+    .note{
+      background:#151923;border-left:4px solid var(--accent);padding:12px 14px;border-radius:14px;color:var(--muted);line-height:1.45;font-size:.93rem
+    }
+    .note.success{background:#102118;border-left-color:var(--success);color:#caedd7}
+    .note.warn{background:#221b10;border-left-color:var(--warning);color:#f6deb0}
+    .note.danger{background:#2a1717;border-left-color:var(--danger);color:#f1c8c8}
+    .searchbar{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px;margin-bottom:14px}
+    .empty{padding:20px;border:1px dashed #4e5363;border-radius:16px;background:rgba(10,11,16,.5);color:var(--muted);text-align:center}
+    .client-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+    .mini{background:#11131a;border:1px solid var(--line);border-radius:12px;padding:10px;font-size:.88rem}
+    .mini strong{display:block;margin-bottom:4px;font-size:.96rem}
+    .duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .tight{margin-top:8px}
+    .hide{display:none!important}
+    .actions-inline{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+    th{color:var(--muted);font-size:.82rem;text-transform:uppercase;letter-spacing:.04em}
+    .toast{
+      position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:none;z-index:50;
+      padding:12px 14px;background:#1d2a22;color:#d6ffe4;border:1px solid #385a45;border-radius:12px;box-shadow:var(--shadow);font-weight:800
+    }
+    a.linkish{color:var(--accent2);text-decoration:none}
+    .footer-note{margin-top:12px;color:var(--muted);font-size:.84rem}
+    @media (max-width:900px){
+      .nav{grid-template-columns:repeat(3,minmax(0,1fr))}
+      .span-3,.span-4,.span-5,.span-6,.span-7,.span-8{grid-column:span 12}
+      .searchbar,.duo{grid-template-columns:1fr}
+      table,thead,tbody,th,td,tr{display:block}
+      thead{display:none}
+      tr{border:1px solid var(--line);border-radius:16px;background:var(--card);margin-bottom:10px;overflow:hidden}
+      td{border-bottom:1px solid rgba(255,255,255,.05)}
+      td:last-child{border-bottom:0}
+      td::before{
+        content:attr(data-label);display:block;color:var(--muted);font-size:.8rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <h1>Salon Client Book</h1>
+      <div class="sub">Hair, waxing, brows, and lashes. Track visits, products, prices, tips, and each client’s personal service rhythm so you know who is due and when.</div>
+      <div class="nav">
+        <button class="active" data-screen="dashboard">Dashboard</button>
+        <button data-screen="clients">Clients</button>
+        <button data-screen="visit">Add Visit</button>
+        <button data-screen="reminders">Reminders</button>
+        <button data-screen="history">History</button>
+        <button data-screen="backup">Backup</button>
+      </div>
+    </div>
+
+    <section class="screen active" id="dashboard">
+      <div class="grid">
+        <div class="card span-12">
+          <div class="grid">
+            <div class="span-3"><div class="kpi"><div class="label">Total clients</div><div class="value" id="kpiClients">0</div></div></div>
+            <div class="span-3"><div class="kpi"><div class="label">Visits this month</div><div class="value" id="kpiVisitsMonth">0</div></div></div>
+            <div class="span-3"><div class="kpi"><div class="label">Service sales this month</div><div class="value" id="kpiSalesMonth">$0</div></div></div>
+            <div class="span-3"><div class="kpi"><div class="label">Tips this month</div><div class="value" id="kpiTipsMonth">$0</div></div></div>
+          </div>
+        </div>
+        <div class="card span-7">
+          <h2>Upcoming + overdue</h2>
+          <div class="note warn">This runs off each client’s saved schedule. Example: a trim every 90 days for one person, brows every 21 days for somebody else.</div>
+          <div class="stack tight" id="dashboardDueList"></div>
+        </div>
+        <div class="card span-5">
+          <h2>Recent visits</h2>
+          <div id="recentVisits"></div>
+        </div>
+        <div class="card span-12">
+          <h2>Category snapshot</h2>
+          <div id="topCategories"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="clients">
+      <div class="grid">
+        <div class="card span-5">
+          <h2>Add client</h2>
+          <div class="row">
+            <label for="clientName">Client name</label>
+            <input id="clientName" placeholder="Ex: Jasmine Carter" />
+          </div>
+          <div class="row">
+            <label for="clientPhone">Phone number</label>
+            <input id="clientPhone" inputmode="tel" placeholder="Ex: 310-555-1212" />
+          </div>
+          <div class="row">
+            <label for="clientNotes">Notes</label>
+            <textarea id="clientNotes" placeholder="Allergies, favorite finish, sensitivity, patch-test notes, lash style, brow preference, etc."></textarea>
+          </div>
+          <div class="btn-row">
+            <button class="primary" id="saveClientBtn">Save client</button>
+            <button class="secondary" id="resetClientBtn">Clear</button>
+          </div>
+          <div class="footer-note">You can add service schedules for each person in the Reminders tab.</div>
+        </div>
+
+        <div class="card span-7">
+          <h2>Your clients</h2>
+          <div class="row"><input id="clientSearch" placeholder="Search by name, phone, or notes" /></div>
+          <div class="stack" id="clientList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="visit">
+      <div class="grid">
+        <div class="card span-8">
+          <h2>Add service visit</h2>
+          <div class="grid">
+            <div class="span-6 row">
+              <label for="visitClient">Client</label>
+              <select id="visitClient"></select>
+            </div>
+            <div class="span-6 row">
+              <label for="visitDate">Date</label>
+              <input id="visitDate" type="date" />
+            </div>
+            <div class="span-6 row">
+              <label for="visitCategory">Category</label>
+              <select id="visitCategory">
+                <option>Hair</option>
+                <option>Waxing</option>
+                <option>Eyebrows</option>
+                <option>Eyelashes</option>
+              </select>
+            </div>
+            <div class="span-6 row">
+              <label for="visitService">Service name</label>
+              <select id="visitService"></select>
+            </div>
+            <div class="span-12 row">
+              <label for="visitCustomService">Custom service name (optional)</label>
+              <input id="visitCustomService" placeholder="Use this if the exact service is not in the list" />
+            </div>
+            <div class="span-12 row">
+              <label for="visitProducts">Products used</label>
+              <textarea id="visitProducts" placeholder="Ex: hard wax, soothing oil / brow tint, mapping pencil / shampoo, mask, heat protectant"></textarea>
+            </div>
+            <div class="span-4 row">
+              <label for="visitCost">Service cost ($)</label>
+              <input id="visitCost" type="number" step="0.01" min="0" placeholder="0.00" />
+            </div>
+            <div class="span-4 row">
+              <label for="visitTip">Tip ($)</label>
+              <input id="visitTip" type="number" step="0.01" min="0" placeholder="0.00" />
+            </div>
+            <div class="span-4 row">
+              <label for="visitNotes">Visit notes</label>
+              <input id="visitNotes" placeholder="Quick detail" />
+            </div>
+          </div>
+
+          <div class="card" style="padding:14px;margin-top:12px;background:#11131b">
+            <h3 style="margin-bottom:10px">Reminder cadence for this service</h3>
+            <div class="duo">
+              <div class="row" style="margin-bottom:0">
+                <label for="visitIntervalDays">Follow-up interval (days)</label>
+                <input id="visitIntervalDays" type="number" min="1" placeholder="Ex: 90 for trims" />
+              </div>
+              <div class="row" style="margin-bottom:0">
+                <label for="visitIntervalWeeks">Quick convert from weeks</label>
+                <input id="visitIntervalWeeks" type="number" min="1" placeholder="Ex: 12 weeks" />
+              </div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <label><input id="visitSaveSchedule" type="checkbox" checked style="width:auto;min-height:auto;margin-right:8px;vertical-align:middle"> Save/update this client’s schedule for this exact service</label>
+            </div>
+            <div class="note">This is the part that makes trims every 3 months work. Save “Trim = 90 days” for one client, and something totally different for the next person.</div>
+          </div>
+
+          <div class="btn-row">
+            <button class="primary" id="saveVisitBtn">Save visit</button>
+            <button class="secondary" id="resetVisitBtn">Clear</button>
+          </div>
+        </div>
+
+        <div class="card span-4">
+          <h2>Service presets</h2>
+          <div id="servicePresetPills"></div>
+          <div class="note tight">When you choose a client and service, the app tries to pull that person’s saved follow-up interval automatically.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="reminders">
+      <div class="grid">
+        <div class="card span-5">
+          <h2>Set service schedule</h2>
+          <div class="row">
+            <label for="planClient">Client</label>
+            <select id="planClient"></select>
+          </div>
+          <div class="row">
+            <label for="planCategory">Category</label>
+            <select id="planCategory">
+              <option>Hair</option>
+              <option>Waxing</option>
+              <option>Eyebrows</option>
+              <option>Eyelashes</option>
+            </select>
+          </div>
+          <div class="row">
+            <label for="planService">Service</label>
+            <select id="planService"></select>
+          </div>
+          <div class="row">
+            <label for="planCustomService">Custom service name (optional)</label>
+            <input id="planCustomService" placeholder="Ex: Trim, Brow Tint + Wax, Lash Fill" />
+          </div>
+          <div class="duo">
+            <div class="row">
+              <label for="planIntervalDays">Frequency (days)</label>
+              <input id="planIntervalDays" type="number" min="1" placeholder="Ex: 90" />
+            </div>
+            <div class="row">
+              <label for="planIntervalWeeks">Frequency (weeks)</label>
+              <input id="planIntervalWeeks" type="number" min="1" placeholder="Ex: 12" />
+            </div>
+          </div>
+          <div class="row">
+            <label for="planNotes">Schedule note (optional)</label>
+            <input id="planNotes" placeholder="Ex: trim with silk press, soft arch cleanup" />
+          </div>
+          <div class="btn-row">
+            <button class="primary" id="savePlanBtn">Save schedule</button>
+            <button class="secondary" id="resetPlanBtn">Clear</button>
+          </div>
+          <div class="note tight">These schedules power the due list. The app compares the latest visit for that exact service against the saved interval.</div>
+        </div>
+
+        <div class="card span-7">
+          <h2>Due soon + overdue list</h2>
+          <div class="duo" style="margin-bottom:12px">
+            <div>
+              <label for="dueFilter">Show</label>
+              <select id="dueFilter">
+                <option value="all">All saved schedules</option>
+                <option value="dueSoon">Due in next 7 days + overdue</option>
+                <option value="overdue">Overdue only</option>
+              </select>
+            </div>
+            <div>
+              <label for="dueClientFilter">Client</label>
+              <select id="dueClientFilter"><option value="">All clients</option></select>
+            </div>
+          </div>
+          <div class="stack" id="planList"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="history">
+      <div class="card">
+        <h2>Visit history</h2>
+        <div class="searchbar">
+          <input id="historySearch" placeholder="Search client, service, product, or note" />
+          <select id="historyCategoryFilter">
+            <option value="">All categories</option>
+            <option>Hair</option>
+            <option>Waxing</option>
+            <option>Eyebrows</option>
+            <option>Eyelashes</option>
+          </select>
+          <select id="historyClientFilter"><option value="">All clients</option></select>
+        </div>
+        <div id="historyWrap"></div>
+      </div>
+    </section>
+
+    <section class="screen" id="backup">
+      <div class="grid">
+        <div class="card span-6">
+          <h2>Backup your data</h2>
+          <div class="note success">Everything lives in this browser on this device unless you export it. Back it up often so your client book doesn’t vanish on some disrespectful tech glitch.</div>
+          <div class="btn-row">
+            <button class="primary" id="exportJsonBtn">Export full backup (.json)</button>
+            <button class="secondary" id="exportCsvBtn">Export visits (.csv)</button>
+            <button class="secondary" id="exportPlansCsvBtn">Export schedules (.csv)</button>
+          </div>
+        </div>
+        <div class="card span-6">
+          <h2>Restore backup</h2>
+          <div class="row">
+            <label for="importFile">Import a saved .json backup</label>
+            <input id="importFile" type="file" accept=".json,application/json" />
+          </div>
+          <div class="note danger">Import replaces the current data on this device with whatever is inside that file.</div>
+        </div>
+        <div class="card span-12">
+          <h2>Use on your phone</h2>
+          <div class="note">This upgraded version is packaged as a small web app. Open the app folder on a web host, then add it to your Home Screen on iPhone. That gives you the closest thing to a real app without going through the App Store.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'salonClientBookV2';
+    const LEGACY_STORAGE_KEY = 'salonClientTrackerV1';
+    const servicePresets = {
+      Hair: ['Silk Press','Shampoo & Style','Trim','Haircut','Root Touch-Up','All Over Color','Gloss/Toner','Deep Conditioning','Blowout','Roller Set','Tape-In Maintenance','Take Down','Protein Treatment'],
+      Waxing: ['Brow Wax','Lip Wax','Chin Wax','Sideburn Wax','Full Face Wax','Underarm Wax','Bikini Wax','Brazilian Wax'],
+      Eyebrows: ['Brow Shaping','Brow Tint','Brow Cleanup','Brow Lamination','Brow Trim'],
+      Eyelashes: ['Lash Lift','Lash Tint','Strip Lash Application','Cluster Lash Set','Cluster Lash Fill','Lash Removal']
+    };
+    const defaultIntervals = {
+      Hair: 42,
+      Waxing: 28,
+      Eyebrows: 28,
+      Eyelashes: 21
+    };
+
+    let state = loadState();
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          const parsed = JSON.parse(raw);
+          return normalizeState(parsed);
+        }
+        const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if(legacyRaw){
+          const legacy = JSON.parse(legacyRaw);
+          const migrated = normalizeState({
+            clients: legacy.clients || [],
+            visits: legacy.visits || [],
+            servicePlans: []
+          });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+          return migrated;
+        }
+      }catch(e){}
+      return {clients:[], visits:[], servicePlans:[]};
+    }
+
+    function normalizeState(parsed){
+      return {
+        clients: Array.isArray(parsed.clients) ? parsed.clients.map(c => ({...c})) : [],
+        visits: Array.isArray(parsed.visits) ? parsed.visits.map(v => ({...v})) : [],
+        servicePlans: Array.isArray(parsed.servicePlans) ? parsed.servicePlans.map(p => ({active:true, ...p})) : []
+      };
+    }
+
+    function saveState(){
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderAll();
+    }
+
+    function uid(prefix='id'){
+      return prefix + '_' + Math.random().toString(36).slice(2,10);
+    }
+
+    function money(v){
+      const n = Number(v || 0);
+      return n.toLocaleString(undefined, {style:'currency', currency:'USD'});
+    }
+
+    function escapeHtml(str){
+      return String(str ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
+
+    function todayISO(){
+      return new Date().toISOString().slice(0,10);
+    }
+
+    function daysAgoISO(days){
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      return d.toISOString().slice(0,10);
+    }
+
+    function daysSince(dateStr){
+      if(!dateStr) return null;
+      const start = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      return Math.max(0, Math.floor((now - start) / 86400000));
+    }
+
+    function addDays(dateStr, days){
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setDate(d.getDate() + Number(days || 0));
+      return d.toISOString().slice(0,10);
+    }
+
+    function daysUntil(dateStr){
+      const target = new Date(dateStr + 'T00:00:00');
+      const now = new Date();
+      return Math.ceil((target - now) / 86400000);
+    }
+
+    function niceAgo(days){
+      if(days == null) return 'Never';
+      if(days === 0) return 'Today';
+      if(days === 1) return '1 day ago';
+      if(days < 7) return `${days} days ago`;
+      const weeks = Math.floor(days / 7);
+      if(weeks < 5) return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
+      const months = Math.floor(days / 30);
+      return months <= 1 ? '1 month ago' : `${months} months ago`;
+    }
+
+    function dateLabel(dateStr){
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+    }
+
+    function monthStartISO(){
+      const d = new Date();
+      return new Date(d.getFullYear(), d.getMonth(), 1).toISOString().slice(0,10);
+    }
+
+    function sortVisitsNewest(a,b){
+      return new Date(b.date) - new Date(a.date);
+    }
+
+    function getClient(id){
+      return state.clients.find(c => c.id === id);
+    }
+
+    function getClientVisits(clientId){
+      return state.visits.filter(v => v.clientId === clientId).sort(sortVisitsNewest);
+    }
+
+    function findPlan(clientId, category, serviceName){
+      return state.servicePlans.find(p =>
+        p.active !== false &&
+        p.clientId === clientId &&
+        p.category === category &&
+        normalizeText(p.serviceName) === normalizeText(serviceName)
+      ) || null;
+    }
+
+    function normalizeText(v){
+      return String(v || '').trim().toLowerCase();
+    }
+
+    function upsertPlan({clientId, category, serviceName, intervalDays, notes=''}) {
+      if(!clientId || !category || !serviceName || !intervalDays) return null;
+      const existing = findPlan(clientId, category, serviceName);
+      if(existing){
+        existing.intervalDays = Number(intervalDays);
+        existing.notes = notes || '';
+        existing.updatedAt = new Date().toISOString();
+        existing.active = true;
+        return existing;
+      }
+      const plan = {
+        id: uid('plan'),
+        clientId, category, serviceName,
+        intervalDays: Number(intervalDays),
+        notes: notes || '',
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      state.servicePlans.push(plan);
+      return plan;
+    }
+
+    function getLatestVisitForPlan(plan){
+      return state.visits
+        .filter(v => v.clientId === plan.clientId && v.category === plan.category && normalizeText(v.serviceName) === normalizeText(plan.serviceName))
+        .sort(sortVisitsNewest)[0] || null;
+    }
+
+    function getLatestVisitForClientCategory(clientId, category){
+      return state.visits.filter(v => v.clientId === clientId && v.category === category).sort(sortVisitsNewest)[0] || null;
+    }
+
+    function getPlanStatus(plan){
+      const latest = getLatestVisitForPlan(plan);
+      if(!latest){
+        return {status:'missing', label:'No visit logged yet', latestVisit:null, nextDueDate:null, daysRemaining:null};
+      }
+      const nextDueDate = addDays(latest.date, plan.intervalDays);
+      const remaining = daysUntil(nextDueDate);
+      let status = 'future';
+      let label = `${remaining} days left`;
+      if(remaining < 0){
+        status = 'overdue';
+        label = `${Math.abs(remaining)} days overdue`;
+      } else if(remaining <= 7){
+        status = 'dueSoon';
+        label = remaining === 0 ? 'Due today' : `Due in ${remaining} day${remaining===1?'':'s'}`;
+      }
+      return {status, label, latestVisit: latest, nextDueDate, daysRemaining: remaining};
+    }
+
+    function clientLifetimeTotals(clientId){
+      return getClientVisits(clientId).reduce((acc,v) => {
+        acc.sales += Number(v.cost || 0);
+        acc.tips += Number(v.tip || 0);
+        acc.visits += 1;
+        return acc;
+      }, {sales:0, tips:0, visits:0});
+    }
+
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => t.style.display = 'none', 2400);
+    }
+
+    function downloadFile(content, filename, type){
+      const blob = new Blob([content], {type});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function toCsv(rows){
+      return rows.map(row => row.map(cell => {
+        const value = String(cell ?? '');
+        return /[",\n]/.test(value) ? '"' + value.replaceAll('"','""') + '"' : value;
+      }).join(',')).join('\n');
+    }
+
+    function renderAll(){
+      renderDashboard();
+      renderClientOptionsEverywhere();
+      renderVisitServiceOptions();
+      renderPlanServiceOptions();
+      renderClientList();
+      renderHistoryTable();
+      renderPlanList();
+    }
+
+    function renderDashboard(){
+      document.getElementById('kpiClients').textContent = state.clients.length;
+      const monthStart = monthStartISO();
+      const visitsMonth = state.visits.filter(v => v.date >= monthStart);
+      document.getElementById('kpiVisitsMonth').textContent = visitsMonth.length;
+      document.getElementById('kpiSalesMonth').textContent = money(visitsMonth.reduce((sum,v)=>sum+Number(v.cost||0),0));
+      document.getElementById('kpiTipsMonth').textContent = money(visitsMonth.reduce((sum,v)=>sum+Number(v.tip||0),0));
+
+      const recentWrap = document.getElementById('recentVisits');
+      const recent = [...state.visits].sort(sortVisitsNewest).slice(0,6);
+      if(!recent.length){
+        recentWrap.innerHTML = '<div class="empty">No visits yet.</div>';
+      } else {
+        recentWrap.innerHTML = recent.map(v => {
+          const client = getClient(v.clientId);
+          return `
+            <div class="list-card">
+              <div class="list-head">
+                <div>
+                  <div class="name">${escapeHtml(client?.name || 'Unknown client')}</div>
+                  <div class="muted tiny">${escapeHtml(v.category)} • ${escapeHtml(v.serviceName)} • ${escapeHtml(dateLabel(v.date))}</div>
+                </div>
+                <div class="tiny">${money(Number(v.cost||0) + Number(v.tip||0))}</div>
+              </div>
+              <div class="tiny muted">Products: ${escapeHtml(v.productsUsed || '—')}</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const catCounts = state.visits.reduce((acc, v) => {
+        acc[v.category] = (acc[v.category] || 0) + 1;
+        return acc;
+      }, {});
+      const topWrap = document.getElementById('topCategories');
+      const entries = Object.entries(catCounts).sort((a,b)=>b[1]-a[1]);
+      topWrap.innerHTML = entries.length ? entries.map(([cat,count]) => `<span class="pill accent">${escapeHtml(cat)}: ${count}</span>`).join('') : '<div class="empty">No service data yet.</div>';
+
+      const dueWrap = document.getElementById('dashboardDueList');
+      const plans = state.servicePlans.filter(p => p.active !== false).map(plan => ({plan, info:getPlanStatus(plan)}));
+      const list = plans
+        .filter(x => x.info.status === 'overdue' || x.info.status === 'dueSoon')
+        .sort((a,b) => (a.info.daysRemaining ?? 9999) - (b.info.daysRemaining ?? 9999));
+      if(!list.length){
+        dueWrap.innerHTML = '<div class="empty">Nobody is due soon from your saved schedules.</div>';
+      } else {
+        dueWrap.innerHTML = list.map(({plan, info}) => {
+          const client = getClient(plan.clientId);
+          const badge = info.status === 'overdue' ? 'danger' : 'warning';
+          return `
+            <div class="list-card">
+              <div class="list-head">
+                <div>
+                  <div class="name">${escapeHtml(client?.name || 'Unknown client')}</div>
+                  <div class="muted tiny">${escapeHtml(plan.category)} • ${escapeHtml(plan.serviceName)}</div>
+                </div>
+                <div class="pill ${badge}">${escapeHtml(info.label)}</div>
+              </div>
+              <div class="tiny muted">Last visit: ${info.latestVisit ? escapeHtml(dateLabel(info.latestVisit.date)) : 'No visit yet'} • Next due: ${info.nextDueDate ? escapeHtml(dateLabel(info.nextDueDate)) : '—'} • Every ${plan.intervalDays} days</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function clientPhoneActions(phone){
+      if(!phone) return '<span class="muted tiny">No phone</span>';
+      const clean = phone.replace(/[^\d+]/g,'');
+      return `<div class="actions-inline"><a class="linkish tiny" href="tel:${escapeHtml(clean)}">Call</a><a class="linkish tiny" href="sms:${escapeHtml(clean)}">Text</a></div>`;
+    }
+
+    function renderClientList(){
+      const wrap = document.getElementById('clientList');
+      const q = normalizeText(document.getElementById('clientSearch').value);
+      let clients = [...state.clients].sort((a,b) => a.name.localeCompare(b.name));
+      if(q){
+        clients = clients.filter(c => normalizeText(c.name).includes(q) || normalizeText(c.phone).includes(q) || normalizeText(c.notes).includes(q));
+      }
+      if(!clients.length){
+        wrap.innerHTML = '<div class="empty">No clients found yet.</div>';
+        return;
+      }
+      wrap.innerHTML = clients.map(client => {
+        const totals = clientLifetimeTotals(client.id);
+        const hair = getLatestVisitForClientCategory(client.id, 'Hair');
+        const waxing = getLatestVisitForClientCategory(client.id, 'Waxing');
+        const brows = getLatestVisitForClientCategory(client.id, 'Eyebrows');
+        const lashes = getLatestVisitForClientCategory(client.id, 'Eyelashes');
+        const plans = state.servicePlans.filter(p => p.clientId === client.id && p.active !== false);
+        return `
+          <div class="list-card">
+            <div class="list-head">
+              <div>
+                <div class="name">${escapeHtml(client.name)}</div>
+                <div class="muted tiny">${escapeHtml(client.phone || 'No phone saved')}</div>
+              </div>
+              <div class="btn-row" style="margin-top:0">
+                <button class="secondary" onclick="startVisitForClient('${client.id}')">New visit</button>
+                <button class="secondary" onclick="startPlanForClient('${client.id}')">Schedule</button>
+                <button class="danger" onclick="deleteClient('${client.id}')">Delete</button>
+              </div>
+            </div>
+            ${client.notes ? `<div class="tiny muted">${escapeHtml(client.notes)}</div>` : ''}
+            ${clientPhoneActions(client.phone)}
+            <div class="client-stats">
+              <div class="mini"><strong>${totals.visits}</strong>Total visits</div>
+              <div class="mini"><strong>${money(totals.sales)}</strong>Service sales</div>
+              <div class="mini"><strong>${money(totals.tips)}</strong>Total tips</div>
+              <div class="mini"><strong>${plans.length}</strong>Saved schedules</div>
+            </div>
+            <div style="margin-top:10px">
+              ${serviceAgePill('Hair', hair)}
+              ${serviceAgePill('Waxing', waxing)}
+              ${serviceAgePill('Brows', brows)}
+              ${serviceAgePill('Lashes', lashes)}
+            </div>
+            <div class="tight">
+              ${plans.length ? plans.map(plan => {
+                const info = getPlanStatus(plan);
+                const cls = info.status === 'overdue' ? 'danger' : info.status === 'dueSoon' ? 'warning' : 'success';
+                return `<span class="pill ${cls}">${escapeHtml(plan.serviceName)} • every ${plan.intervalDays}d • ${escapeHtml(info.label)}</span>`;
+              }).join('') : '<span class="pill">No saved schedules yet</span>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function serviceAgePill(label, visit){
+      if(!visit) return `<span class="pill">${label}: never</span>`;
+      return `<span class="pill">${label}: ${niceAgo(daysSince(visit.date))}</span>`;
+    }
+
+    function renderClientOptionsEverywhere(){
+      const clients = [...state.clients].sort((a,b)=>a.name.localeCompare(b.name));
+      const opts = clients.length ? clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('') : '<option value="">Add a client first</option>';
+      document.getElementById('visitClient').innerHTML = opts;
+      document.getElementById('planClient').innerHTML = opts;
+      document.getElementById('historyClientFilter').innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+      document.getElementById('dueClientFilter').innerHTML = '<option value="">All clients</option>' + clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+    }
+
+    function renderVisitServiceOptions(){
+      const category = document.getElementById('visitCategory').value;
+      const select = document.getElementById('visitService');
+      const pills = document.getElementById('servicePresetPills');
+      const list = servicePresets[category] || [];
+      select.innerHTML = list.map(x => `<option>${escapeHtml(x)}</option>`).join('');
+      pills.innerHTML = list.map(x => `<span class="pill accent">${escapeHtml(x)}</span>`).join('');
+      refreshVisitInterval();
+    }
+
+    function renderPlanServiceOptions(){
+      const category = document.getElementById('planCategory').value;
+      const select = document.getElementById('planService');
+      const list = servicePresets[category] || [];
+      select.innerHTML = list.map(x => `<option>${escapeHtml(x)}</option>`).join('');
+    }
+
+    function currentVisitServiceName(){
+      return document.getElementById('visitCustomService').value.trim() || document.getElementById('visitService').value;
+    }
+
+    function refreshVisitInterval(){
+      const clientId = document.getElementById('visitClient').value;
+      const category = document.getElementById('visitCategory').value;
+      const serviceName = currentVisitServiceName();
+      const plan = clientId && serviceName ? findPlan(clientId, category, serviceName) : null;
+      const intervalInput = document.getElementById('visitIntervalDays');
+      if(plan){
+        intervalInput.value = plan.intervalDays;
+      } else if(!intervalInput.value) {
+        intervalInput.value = defaultIntervals[category] || '';
+      }
+      document.getElementById('visitIntervalWeeks').value = '';
+    }
+
+    function renderHistoryTable(){
+      const wrap = document.getElementById('historyWrap');
+      const q = normalizeText(document.getElementById('historySearch').value);
+      const category = document.getElementById('historyCategoryFilter').value;
+      const clientId = document.getElementById('historyClientFilter').value;
+      let visits = [...state.visits].sort(sortVisitsNewest);
+      if(q){
+        visits = visits.filter(v => {
+          const client = getClient(v.clientId);
+          return [client?.name, v.serviceName, v.productsUsed, v.notes].some(x => normalizeText(x).includes(q));
+        });
+      }
+      if(category) visits = visits.filter(v => v.category === category);
+      if(clientId) visits = visits.filter(v => v.clientId === clientId);
+
+      if(!visits.length){
+        wrap.innerHTML = '<div class="empty">No visits match that search.</div>';
+        return;
+      }
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th><th>Client</th><th>Category</th><th>Service</th><th>Products</th><th>Cost</th><th>Tip</th><th>Gap</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${visits.map(v => {
+              const client = getClient(v.clientId);
+              return `
+                <tr>
+                  <td data-label="Date">${escapeHtml(dateLabel(v.date))}</td>
+                  <td data-label="Client">${escapeHtml(client?.name || 'Unknown')}</td>
+                  <td data-label="Category">${escapeHtml(v.category)}</td>
+                  <td data-label="Service">${escapeHtml(v.serviceName)}</td>
+                  <td data-label="Products">${escapeHtml(v.productsUsed || '—')}</td>
+                  <td data-label="Cost">${money(v.cost)}</td>
+                  <td data-label="Tip">${money(v.tip)}</td>
+                  <td data-label="Gap">${escapeHtml(v.daysSinceSameServiceLabel || 'First time logged')}</td>
+                  <td data-label="Action"><button class="danger" onclick="deleteVisit('${v.id}')">Delete</button></td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderPlanList(){
+      const wrap = document.getElementById('planList');
+      const dueFilter = document.getElementById('dueFilter').value;
+      const clientId = document.getElementById('dueClientFilter').value;
+      let plans = state.servicePlans.filter(p => p.active !== false);
+      if(clientId) plans = plans.filter(p => p.clientId === clientId);
+      const detailed = plans.map(plan => ({plan, info:getPlanStatus(plan)}));
+      let filtered = detailed;
+      if(dueFilter === 'overdue') filtered = detailed.filter(x => x.info.status === 'overdue');
+      if(dueFilter === 'dueSoon') filtered = detailed.filter(x => x.info.status === 'overdue' || x.info.status === 'dueSoon');
+      filtered.sort((a,b) => {
+        const ad = a.info.daysRemaining ?? 9999;
+        const bd = b.info.daysRemaining ?? 9999;
+        return ad - bd;
+      });
+
+      if(!filtered.length){
+        wrap.innerHTML = '<div class="empty">No schedules match that filter.</div>';
+        return;
+      }
+
+      wrap.innerHTML = filtered.map(({plan, info}) => {
+        const client = getClient(plan.clientId);
+        const badgeClass = info.status === 'overdue' ? 'danger' : info.status === 'dueSoon' ? 'warning' : info.status === 'missing' ? '' : 'success';
+        const msg = buildReminderMessage(plan, client, info);
+        return `
+          <div class="list-card">
+            <div class="list-head">
+              <div>
+                <div class="name">${escapeHtml(client?.name || 'Unknown client')}</div>
+                <div class="muted tiny">${escapeHtml(plan.category)} • ${escapeHtml(plan.serviceName)} • every ${plan.intervalDays} days</div>
+              </div>
+              <div class="pill ${badgeClass}">${escapeHtml(info.label)}</div>
+            </div>
+            <div class="tiny muted">Last visit: ${info.latestVisit ? escapeHtml(dateLabel(info.latestVisit.date)) : 'No visit yet'} • Next due: ${info.nextDueDate ? escapeHtml(dateLabel(info.nextDueDate)) : '—'}</div>
+            ${plan.notes ? `<div class="tiny muted" style="margin-top:6px">Note: ${escapeHtml(plan.notes)}</div>` : ''}
+            <div class="actions-inline">
+              <button class="secondary" onclick="usePlanInVisit('${plan.id}')">Log this service</button>
+              <button class="secondary" onclick="editPlanIntoForm('${plan.id}')">Edit</button>
+              ${client?.phone ? `<a class="linkish tiny" href="sms:${escapeHtml(client.phone.replace(/[^\d+]/g,''))}">Open text</a>` : ''}
+              <button class="secondary" onclick="copyReminderText('${plan.id}')">Copy reminder text</button>
+              <button class="danger" onclick="deletePlan('${plan.id}')">Delete</button>
+            </div>
+            <div class="footer-note">${escapeHtml(msg)}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function buildReminderMessage(plan, client, info){
+      const first = (client?.name || 'Hey').split(' ')[0];
+      if(info.status === 'overdue'){
+        return `Hey ${first}, you’re due for your ${plan.serviceName.toLowerCase()}. Want to book this week?`;
+      }
+      if(info.status === 'dueSoon'){
+        return `Hey ${first}, your ${plan.serviceName.toLowerCase()} is coming up soon. Want me to get you back on the books?`;
+      }
+      if(info.status === 'missing'){
+        return `No visit logged yet for this schedule. Once you add a visit, the due date will calculate itself.`;
+      }
+      return `Next follow-up lands around ${dateLabel(info.nextDueDate)}.`;
+    }
+
+    function deleteClient(id){
+      const client = getClient(id);
+      if(!client) return;
+      if(!confirm(`Delete ${client.name} and all visits and schedules for this client?`)) return;
+      state.clients = state.clients.filter(c => c.id !== id);
+      state.visits = state.visits.filter(v => v.clientId !== id);
+      state.servicePlans = state.servicePlans.filter(p => p.clientId !== id);
+      saveState();
+      showToast('Client deleted');
+    }
+    window.deleteClient = deleteClient;
+
+    function deleteVisit(id){
+      if(!confirm('Delete this visit?')) return;
+      state.visits = state.visits.filter(v => v.id !== id);
+      saveState();
+      showToast('Visit deleted');
+    }
+    window.deleteVisit = deleteVisit;
+
+    function deletePlan(id){
+      if(!confirm('Delete this service schedule?')) return;
+      state.servicePlans = state.servicePlans.filter(p => p.id !== id);
+      saveState();
+      showToast('Schedule deleted');
+    }
+    window.deletePlan = deletePlan;
+
+    function startVisitForClient(clientId){
+      openScreen('visit');
+      document.getElementById('visitClient').value = clientId;
+      refreshVisitInterval();
+    }
+    window.startVisitForClient = startVisitForClient;
+
+    function startPlanForClient(clientId){
+      openScreen('reminders');
+      document.getElementById('planClient').value = clientId;
+    }
+    window.startPlanForClient = startPlanForClient;
+
+    function usePlanInVisit(planId){
+      const plan = state.servicePlans.find(p => p.id === planId);
+      if(!plan) return;
+      openScreen('visit');
+      document.getElementById('visitClient').value = plan.clientId;
+      document.getElementById('visitCategory').value = plan.category;
+      renderVisitServiceOptions();
+      const presetMatch = (servicePresets[plan.category] || []).find(x => normalizeText(x) === normalizeText(plan.serviceName));
+      if(presetMatch){
+        document.getElementById('visitService').value = presetMatch;
+        document.getElementById('visitCustomService').value = '';
+      } else {
+        document.getElementById('visitCustomService').value = plan.serviceName;
+      }
+      document.getElementById('visitIntervalDays').value = plan.intervalDays;
+      document.getElementById('visitSaveSchedule').checked = true;
+      refreshVisitInterval();
+    }
+    window.usePlanInVisit = usePlanInVisit;
+
+    function editPlanIntoForm(planId){
+      const plan = state.servicePlans.find(p => p.id === planId);
+      if(!plan) return;
+      openScreen('reminders');
+      document.getElementById('planClient').value = plan.clientId;
+      document.getElementById('planCategory').value = plan.category;
+      renderPlanServiceOptions();
+      const presetMatch = (servicePresets[plan.category] || []).find(x => normalizeText(x) === normalizeText(plan.serviceName));
+      if(presetMatch){
+        document.getElementById('planService').value = presetMatch;
+        document.getElementById('planCustomService').value = '';
+      } else {
+        document.getElementById('planCustomService').value = plan.serviceName;
+      }
+      document.getElementById('planIntervalDays').value = plan.intervalDays;
+      document.getElementById('planIntervalWeeks').value = '';
+      document.getElementById('planNotes').value = plan.notes || '';
+    }
+    window.editPlanIntoForm = editPlanIntoForm;
+
+    function copyReminderText(planId){
+      const plan = state.servicePlans.find(p => p.id === planId);
+      if(!plan) return;
+      const client = getClient(plan.clientId);
+      const info = getPlanStatus(plan);
+      const msg = buildReminderMessage(plan, client, info);
+      navigator.clipboard?.writeText(msg).then(() => showToast('Reminder text copied')).catch(() => {
+        prompt('Copy this text:', msg);
+      });
+    }
+    window.copyReminderText = copyReminderText;
+
+    function openScreen(screenId){
+      document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.screen === screenId));
+      document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === screenId));
+    }
+
+    document.querySelectorAll('.nav button').forEach(btn => btn.addEventListener('click', () => openScreen(btn.dataset.screen)));
+    document.getElementById('visitCategory').addEventListener('change', renderVisitServiceOptions);
+    document.getElementById('planCategory').addEventListener('change', renderPlanServiceOptions);
+    document.getElementById('visitClient').addEventListener('change', refreshVisitInterval);
+    document.getElementById('visitService').addEventListener('change', refreshVisitInterval);
+    document.getElementById('visitCustomService').addEventListener('input', refreshVisitInterval);
+    document.getElementById('clientSearch').addEventListener('input', renderClientList);
+    document.getElementById('historySearch').addEventListener('input', renderHistoryTable);
+    document.getElementById('historyCategoryFilter').addEventListener('change', renderHistoryTable);
+    document.getElementById('historyClientFilter').addEventListener('change', renderHistoryTable);
+    document.getElementById('dueFilter').addEventListener('change', renderPlanList);
+    document.getElementById('dueClientFilter').addEventListener('change', renderPlanList);
+
+    document.getElementById('visitIntervalWeeks').addEventListener('input', (e) => {
+      const weeks = Number(e.target.value || 0);
+      if(weeks > 0) document.getElementById('visitIntervalDays').value = weeks * 7;
+    });
+
+    document.getElementById('planIntervalWeeks').addEventListener('input', (e) => {
+      const weeks = Number(e.target.value || 0);
+      if(weeks > 0) document.getElementById('planIntervalDays').value = weeks * 7;
+    });
+
+    document.getElementById('saveClientBtn').addEventListener('click', () => {
+      const name = document.getElementById('clientName').value.trim();
+      const phone = document.getElementById('clientPhone').value.trim();
+      const notes = document.getElementById('clientNotes').value.trim();
+      if(!name) return alert('Add the client name first.');
+      state.clients.push({id:uid('client'), name, phone, notes, createdAt:new Date().toISOString()});
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientPhone').value = '';
+      document.getElementById('clientNotes').value = '';
+      saveState();
+      showToast('Client saved');
+    });
+
+    document.getElementById('resetClientBtn').addEventListener('click', () => {
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientPhone').value = '';
+      document.getElementById('clientNotes').value = '';
+    });
+
+    document.getElementById('savePlanBtn').addEventListener('click', () => {
+      const clientId = document.getElementById('planClient').value;
+      const category = document.getElementById('planCategory').value;
+      const serviceName = document.getElementById('planCustomService').value.trim() || document.getElementById('planService').value;
+      const intervalDays = Number(document.getElementById('planIntervalDays').value || 0);
+      const notes = document.getElementById('planNotes').value.trim();
+      if(!clientId) return alert('Choose a client first.');
+      if(!serviceName) return alert('Choose or type a service.');
+      if(!intervalDays) return alert('Add the schedule in days or weeks.');
+      upsertPlan({clientId, category, serviceName, intervalDays, notes});
+      saveState();
+      showToast('Schedule saved');
+    });
+
+    document.getElementById('resetPlanBtn').addEventListener('click', () => {
+      document.getElementById('planCustomService').value = '';
+      document.getElementById('planIntervalDays').value = '';
+      document.getElementById('planIntervalWeeks').value = '';
+      document.getElementById('planNotes').value = '';
+    });
+
+    document.getElementById('saveVisitBtn').addEventListener('click', () => {
+      const clientId = document.getElementById('visitClient').value;
+      const date = document.getElementById('visitDate').value;
+      const category = document.getElementById('visitCategory').value;
+      const serviceName = document.getElementById('visitCustomService').value.trim() || document.getElementById('visitService').value;
+      const productsUsed = document.getElementById('visitProducts').value.trim();
+      const cost = Number(document.getElementById('visitCost').value || 0);
+      const tip = Number(document.getElementById('visitTip').value || 0);
+      const notes = document.getElementById('visitNotes').value.trim();
+      const intervalDays = Number(document.getElementById('visitIntervalDays').value || 0);
+      const saveSchedule = document.getElementById('visitSaveSchedule').checked;
+      if(!clientId) return alert('Choose a client first.');
+      if(!date) return alert('Pick the visit date.');
+      if(!serviceName) return alert('Choose or type a service name.');
+
+      const prior = state.visits
+        .filter(v => v.clientId === clientId && normalizeText(v.serviceName) === normalizeText(serviceName) && v.date < date)
+        .sort(sortVisitsNewest)[0];
+      const daysGap = prior ? Math.floor((new Date(date + 'T00:00:00') - new Date(prior.date + 'T00:00:00')) / 86400000) : null;
+
+      state.visits.push({
+        id: uid('visit'),
+        clientId, date, category, serviceName, productsUsed, cost, tip, notes,
+        daysSinceSameService: daysGap,
+        daysSinceSameServiceLabel: daysGap == null ? 'First time logged' : `${daysGap} days since last ${serviceName}`,
+        createdAt: new Date().toISOString()
+      });
+      state.visits.sort(sortVisitsNewest);
+
+      if(saveSchedule && intervalDays > 0){
+        upsertPlan({clientId, category, serviceName, intervalDays});
+      }
+
+      resetVisitForm(false);
+      saveState();
+      showToast('Visit saved');
+    });
+
+    document.getElementById('resetVisitBtn').addEventListener('click', () => resetVisitForm(true));
+
+    function resetVisitForm(clearClient=true){
+      if(clearClient) document.getElementById('visitClient').selectedIndex = 0;
+      document.getElementById('visitDate').value = todayISO();
+      document.getElementById('visitCategory').value = 'Hair';
+      renderVisitServiceOptions();
+      document.getElementById('visitCustomService').value = '';
+      document.getElementById('visitProducts').value = '';
+      document.getElementById('visitCost').value = '';
+      document.getElementById('visitTip').value = '';
+      document.getElementById('visitNotes').value = '';
+      document.getElementById('visitIntervalDays').value = '';
+      document.getElementById('visitIntervalWeeks').value = '';
+      document.getElementById('visitSaveSchedule').checked = true;
+      refreshVisitInterval();
+    }
+
+    document.getElementById('exportJsonBtn').addEventListener('click', () => {
+      downloadFile(JSON.stringify(state, null, 2), `salon-client-book-backup-${todayISO()}.json`, 'application/json');
+    });
+
+    document.getElementById('exportCsvBtn').addEventListener('click', () => {
+      const rows = [['Date','Client','Phone','Category','Service','Products Used','Service Cost','Tip','Total Paid','Since Same Service','Notes']];
+      [...state.visits].sort(sortVisitsNewest).forEach(v => {
+        const c = getClient(v.clientId) || {};
+        rows.push([
+          v.date, c.name || '', c.phone || '', v.category, v.serviceName, v.productsUsed || '',
+          Number(v.cost||0).toFixed(2), Number(v.tip||0).toFixed(2), (Number(v.cost||0)+Number(v.tip||0)).toFixed(2),
+          v.daysSinceSameServiceLabel || '', v.notes || ''
+        ]);
+      });
+      downloadFile(toCsv(rows), `salon-visits-${todayISO()}.csv`, 'text/csv');
+    });
+
+    document.getElementById('exportPlansCsvBtn').addEventListener('click', () => {
+      const rows = [['Client','Phone','Category','Service','Interval Days','Last Visit','Next Due','Status','Plan Notes']];
+      state.servicePlans.filter(p => p.active !== false).forEach(plan => {
+        const client = getClient(plan.clientId) || {};
+        const info = getPlanStatus(plan);
+        rows.push([
+          client.name || '', client.phone || '', plan.category, plan.serviceName, plan.intervalDays,
+          info.latestVisit?.date || '', info.nextDueDate || '', info.label || '', plan.notes || ''
+        ]);
+      });
+      downloadFile(toCsv(rows), `salon-schedules-${todayISO()}.csv`, 'text/csv');
+    });
+
+    document.getElementById('importFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if(!file) return;
+      try{
+        const parsed = JSON.parse(await file.text());
+        state = normalizeState(parsed);
+        saveState();
+        showToast('Backup imported');
+      } catch {
+        alert('That backup file does not look right.');
+      } finally {
+        e.target.value = '';
+      }
+    });
+
+    function registerPWA(){
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register('./service-worker.js').catch(()=>{});
+      }
+    }
+
+    document.getElementById('visitDate').value = todayISO();
+    renderAll();
+    registerPWA();
+  </script>
+</body>
+</html>
